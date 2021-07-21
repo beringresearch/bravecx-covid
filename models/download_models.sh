@@ -2,7 +2,7 @@ wget https://www.dropbox.com/sh/j2fkshvhwkhevz6/AACcyt021j47Ap0F0sMeYZ3Ma -O inc
 unzip inceptionv3_299_299_ap-pa.zip -d inceptionv3_299_299_ap-pa
 
 wget https://www.dropbox.com/sh/39aw2hbfxzlqqx1/AABnIGxO5Aj2q9A9VxpeCrzwa -O inceptionv3_299_299_frontal_lateral.zip
-unzip inceptionv3_299_299_frontal_lateral.zip -d inceptionv3_299_299_frontal_lateral.zip
+unzip inceptionv3_299_299_frontal_lateral.zip -d inceptionv3_299_299_frontal_lateral
 
 wget https://www.dropbox.com/sh/xdfbcimgvud4dp1/AAAVWJbxfxPjUL-nfab2vIuFa -O inceptionv3_299_299_other-chest.zip
 unzip inceptionv3_299_299_other-chest.zip -d inceptionv3_299_299_other-chest
