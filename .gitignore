@@ -2,3 +2,4 @@ models/inception*
 models/resnet50_unet_segmentation_covix
 
 __pycache__
+*.json
