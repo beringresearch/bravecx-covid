@@ -15,11 +15,11 @@ from dicom_io import read_dicom_uint8, read_dicom_uint16, preprocess_uint8_resne
 from img_io import read_jpg_uint8
 from image_crop import crop_image_to_mask
 
-def crop_dicom_to_mask(image, mask):
+def crop_dicom_to_mask(image, mask, preprocess_fn=None):
     x = crop_image_to_mask(image, mask,
                                crop_shape=(299, 299),
                                soft_mask=True, crop_masked_img=False)
-    x = preprocess_uint16_inception_input(x)
+    x = preprocess_fn(x)
     return x
 
 input_path = sys.argv[1]
@@ -98,13 +98,17 @@ MASK = tf.image.resize(MASK, size=(IMG_SHAPE[0], IMG_SHAPE[1]), method='nearest'
 print('Running CovIx Ensemble...')
 mask_model = tf.keras.models.load_model('models/inceptionv3_masks_299_299_diagnosis', compile=False)
 
-if IS_DICOM:
+if IS_DICOM & (BITS > 8):
     cxr = read_dicom_uint16(input_path, target_size=(1500, 1500))
+    x = np.array([crop_dicom_to_mask(cxr, MASK, preprocess_uint16_inception_input) for i in range(50)])
+elif IS_DICOM & (BITS == 8):
+    cxr = read_dicom_uint8(input_path, target_size=(1500, 1500))
+    cxr = tf.reshape(cxr, (1500, 1500, 3))
+    x = np.array([crop_dicom_to_mask(cxr, MASK, preprocess_input) for i in range(50)])
 else:
     cxr = read_jpg_uint8(input_path, target_size=(1500, 1500))
+    x = np.array([crop_dicom_to_mask(cxr, MASK, preprocess_input) for i in range(50)])
 
-
-x = np.array([crop_dicom_to_mask(cxr, MASK) for i in range(50)])
 mask_proba = np.mean(mask_model.predict(x), axis=0)
 
 multioutput299 = tf.keras.models.load_model('models/inceptionv3_multi_output_299_299_diagnosis', compile=False)

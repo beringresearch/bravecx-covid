@@ -1,5 +1,6 @@
 models/inception*
 models/resnet50_unet_segmentation_covix
 
+.ipynb_checkpoints
 __pycache__
 *.json
