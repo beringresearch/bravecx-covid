@@ -41,3 +41,7 @@ def preprocess_uint16_inception_input(x):
     x /= 32767.5
     x -= 1
     return x
+
+def preprocess_arbitrary_inception_input(x):
+    res = (2 * (x - np.min(x))/(np.max(x) - np.min(x))) - 1
+    return res

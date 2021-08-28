@@ -3,6 +3,7 @@ import json
 import os
 import pydicom
 import datetime
+import cv2
 
 import pandas as pd
 import numpy as np
@@ -12,8 +13,13 @@ import tensorflow as tf
 from tensorflow.keras.applications.inception_v3 import preprocess_input
 
 from dicom_io import read_dicom_uint8, read_dicom_uint16, preprocess_uint8_resnet, preprocess_uint16_inception_input
-from img_io import read_jpg_uint8
+from img_io import read_image
 from image_crop import crop_image_to_mask
+
+def get_allocated_bits(img_path):
+    img = cv2.imread(input_path, cv2.IMREAD_UNCHANGED)
+    bits = int(np.where(img.dtype=='uint16', 16, 8))
+    return bits
 
 def crop_dicom_to_mask(image, mask, preprocess_fn=None):
     x = crop_image_to_mask(image, mask,
@@ -44,10 +50,15 @@ if IS_DICOM:
         AGE = -1
 else:
     print('WARNING: input is not in DICOM format')
-    object = read_jpg_uint8(input_path, target_size=None)
+    
+    BITS = get_allocated_bits(input_path)
+    if BITS == 16:
+        dtype=tf.uint16
+    else:
+        dtype = tf.uint8
+    object = read_image(input_path, target_size=None)
     IMG_SHAPE = object.shape
     AGE = -1
-    BITS = 8
 
 if (IMG_SHAPE[0] < 1500) | (IMG_SHAPE[1] < 1500):
     print('WARNING: image resolution is lower than 1500x1500. Interpret with caution!')
@@ -68,7 +79,7 @@ view_position = tf.keras.models.load_model('models/inceptionv3_299_299_ap-pa', c
 if IS_DICOM:
     x = read_dicom_uint8(input_path, target_size=(299, 299), preprocess_fn=preprocess_input)
 else:
-    x = read_jpg_uint8(input_path, target_size=(299, 299), preprocess_fn=preprocess_input)
+    x = read_image(input_path, target_size=(299, 299), preprocess_fn=preprocess_input)
     x = tf.reshape(x, (1, 299, 299, 3))
 
 proba_body_part = body_part.predict(x)
@@ -86,8 +97,8 @@ if IS_DICOM:
     x = read_dicom_uint8(input_path, target_size=(512, 512),
                         preprocess_fn=preprocess_uint8_resnet)
 else:
-    x = read_jpg_uint8(input_path, target_size=(512, 512),
-                        preprocess_fn=preprocess_uint8_resnet)
+    x = read_image(input_path, target_size=(512, 512),
+                   preprocess_fn=preprocess_uint8_resnet)
     x = tf.reshape(x, (1, 512, 512, 3))
 
 proba = cxr_segmentation.predict(x)
@@ -106,7 +117,7 @@ elif IS_DICOM & (BITS == 8):
     cxr = tf.reshape(cxr, (1500, 1500, 3))
     x = np.array([crop_dicom_to_mask(cxr, MASK, preprocess_input) for i in range(50)])
 else:
-    cxr = read_jpg_uint8(input_path, target_size=(1500, 1500))
+    cxr = read_image(input_path, target_size=(1500, 1500))
     x = np.array([crop_dicom_to_mask(cxr, MASK, preprocess_input) for i in range(50)])
 
 mask_proba = np.mean(mask_model.predict(x), axis=0)
@@ -124,8 +135,8 @@ elif IS_DICOM & (BITS < 16):
     x_299 = tf.reshape(x_299, (299, 299, 3))
     x_764 = tf.reshape(x_764, (764, 764, 3))
 else:
-    x_299 = read_jpg_uint8(input_path, target_size=(299, 299), preprocess_fn=preprocess_input)
-    x_764 = read_jpg_uint8(input_path, target_size=(764, 764), preprocess_fn=preprocess_input)
+    x_299 = read_image(input_path, target_size=(299, 299), preprocess_fn=preprocess_input)
+    x_764 = read_image(input_path, target_size=(764, 764), preprocess_fn=preprocess_input)
 
 proba_multioutput_299 = multioutput299.predict(np.array([x_299]))[1]
 proba_multioutput_764 = multioutput764.predict(np.array([x_764]))[1]
