@@ -64,7 +64,7 @@ else:
 
 if (IMG_SHAPE[0] < 1500) | (IMG_SHAPE[1] < 1500):
     print('WARNING: image resolution is lower than 1500x1500. Interpret with caution!')
-    WARNINGS.append('WARNING: image resolution is lower than 1500x1500. Interpret with caution!')
+    WARNINGS.append('WARNING: image resolution is lower than 1500x1500 and COVID-19 models are likely to work incorrectly. You can still determine X-Ray normality using multioutput_764_proba values. Interpret with caution!')
 
 if BITS < 16:
     print('WARNING: BitsStored is under 16, falling back to 8-Bit inference. Interpret with caution!')
