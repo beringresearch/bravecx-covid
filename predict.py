@@ -31,6 +31,7 @@ def crop_dicom_to_mask(image, mask, preprocess_fn=None):
 input_path = sys.argv[1]
 
 IS_DICOM = False
+WARNINGS = []
 
 if input_path.endswith('.dcm'):
     IS_DICOM = True
@@ -50,6 +51,7 @@ if IS_DICOM:
         AGE = -1
 else:
     print('WARNING: input is not in DICOM format')
+    WARNINGS.append('WARNING: input is not in DICOM format')
     
     BITS = get_allocated_bits(input_path)
     if BITS == 16:
@@ -62,9 +64,11 @@ else:
 
 if (IMG_SHAPE[0] < 1500) | (IMG_SHAPE[1] < 1500):
     print('WARNING: image resolution is lower than 1500x1500. Interpret with caution!')
+    WARNINGS.append('WARNING: image resolution is lower than 1500x1500. Interpret with caution!')
 
 if BITS < 16:
     print('WARNING: BitsStored is under 16, falling back to 8-Bit inference. Interpret with caution!')
+    WARNINGS.append('WARNING: BitsStored is under 16, falling back to 8-Bit inference. Interpret with caution!')
 
 dicom_metadata = {'age': AGE,
                'rows': IMG_SHAPE[0],
@@ -154,7 +158,8 @@ result = {'input': input_path,
          'dicom_metadata': dicom_metadata,
          'image_metadata': image_metadata,
          'probas': proba,
-         'class_names': ['normal', 'abnormal', 'pneumonia', 'covid+']}
+         'class_names': ['normal', 'abnormal', 'pneumonia', 'covid+'],
+         'warnings': WARNINGS}
 
 print(result)
 
