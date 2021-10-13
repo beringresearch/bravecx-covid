@@ -15,3 +15,14 @@ bash download_models.sh
 cd ../
 python3 predict.py data/dicom_00000001_000.dcm
 ```
+
+## Model Inclusion Criteria
+
+BraveCX-COVID classifiers were trained on X-Rays satisfying the following inclusion criteria:
+
+* Body Part: Chest X-Ray
+* Image Format: DICOM
+* Minimum Resolution: 1500x1500
+* View Position: Frontal (AP or PA)
+* Minimum Bits Allocated: 16
+* Patient Age: ≥16 years old
