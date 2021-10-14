@@ -26,3 +26,8 @@ BraveCX-COVID classifiers were trained on X-Rays satisfying the following inclus
 * View Position: Frontal (AP or PA)
 * Minimum Bits Allocated: 16
 * Patient Age: ≥16 years old
+
+## Contact Us
+
+e-mail: info@beringresearch.com
+twitter: https://twitter.com/beringresearch
