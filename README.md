@@ -29,5 +29,5 @@ BraveCX-COVID classifiers were trained on X-Rays satisfying the following inclus
 
 ## Contact Us
 
-e-mail: info@beringresearch.com
-twitter: https://twitter.com/beringresearch
+* e-mail: info@beringresearch.com
+* twitter: https://twitter.com/beringresearch
